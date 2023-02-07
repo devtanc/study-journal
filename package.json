@@ -28,7 +28,10 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "rules": {
+      "no-loop-func":"off"
+    }
   },
   "browserslist": {
     "production": [
