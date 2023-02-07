@@ -1,0 +1,19 @@
+services:
+  neo4j:
+    image: neo4j
+    restart: unless-stopped
+    container_name: neo4j-development
+    ports:
+      - 7474:7474
+      - 7687:7687
+    volumes:
+      - /Users/devtanc/Docker/volumes/neo4j/conf:/conf
+      - /Users/devtanc/Docker/volumes/neo4j/data:/data
+      - /Users/devtanc/Docker/volumes/neo4j/logs:/logs
+      - /Users/devtanc/Docker/volumes/neo4j/plugins:/plugins
+      - /Users/devtanc/Docker/volumes/neo4j/import:/var/lib/neo4j/import
+    environment: 
+      # Raise memory limits
+      - NEO4J_server.memory.pagecache.size=8G
+      - NEO4J_server.memory.heap.initial_size=8G
+      - NEO4J_server.memory.heap.max_size=16G
