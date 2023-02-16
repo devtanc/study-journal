@@ -7,8 +7,8 @@ import fs from "fs/promises";
 
 const logFile = "./logs.txt";
 const errorFile = "./error.txt";
-// const uri = "neo4j://localhost:7687";
-const uri = "neo4j://192.168.1.3:7687"
+const uri = "neo4j://localhost:7687";
+// const uri = "neo4j://192.168.1.3:7687"
 
 const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
 
@@ -148,10 +148,46 @@ const writeChapter = async (
   }
 };
 
+const linkBooks = async (
+  prevBookTitle: string,
+  bookTitle: string
+) => {
+  let additionalCommands: string[] = [];
+
+  additionalCommands.push(
+    `MATCH (prevBook:Book {title: "${prevBookTitle}"})`
+  );
+  additionalCommands.push(`MATCH (nextBook:Book {title: "${bookTitle}"})`);
+  additionalCommands.push(`CREATE (prevBook)-[:NEXT]->(nextBook)`);
+
+  const commandList = additionalCommands.join("\n");
+
+  const session = driver.session();
+  try {
+    await session.executeWrite(async (tx) => {
+      const result = await tx.run(commandList);
+      await fs.appendFile(
+        logFile,
+        `***** LINK BOOK QUERY *****\n${result.summary.query.text}\n\n`
+      );
+    });
+  } catch (error: any) {
+    await fs.appendFile(
+      errorFile,
+      `***** ERROR LINKING BOOKS *****\n${error.message}\n\nCOMMAND\n${commandList}\n\nPARAMS:NONE\n\n\n`
+    );
+    console.error(error);
+  } finally {
+    await session.close();
+  }
+};
+
 const run = async () => {
   let prevVerseTitle: string = "";
   for (const [volumeTitle, mappedBook] of Object.entries(mappedLdsVerses)) {
     let volumeVerseCount = 0;
+    let prevBookTitle = "";
+    let bookIndex = 0;
     for (const [bookTitle, verses] of Object.entries(mappedBook)) {
       let bookVerseActual = 0;
       volumeVerseCount += verses.length;
@@ -159,12 +195,13 @@ const run = async () => {
         `MERGE (v:Volume {title: $volumeTitle, short_title: $volumeShortTitle})`,
       ];
       parentCommands.push(
-        `MERGE (b:Book {title: $bookTitle, short_title: $bookShortTitle})-[:IN]->(v)`
+        `MERGE (b:Book {title: $bookTitle, short_title: $bookShortTitle, index: $bookIndex})-[:IN]->(v)`
       );
       const { book_short_title } = verses[0];
       let params: any = {
         volumeTitle,
         bookTitle,
+        bookIndex,
         volumeShortTitle: volumeShortTitles[volumeTitle],
         bookShortTitle: book_short_title,
       };
@@ -188,6 +225,7 @@ const run = async () => {
             params = {
               volumeTitle,
               bookTitle,
+              bookIndex,
               volumeShortTitle: volumeShortTitles[volumeTitle],
               bookShortTitle: book_short_title,
             };
@@ -225,17 +263,31 @@ const run = async () => {
       }
 
       // Write last chapter
-      await writeChapter(
-        { verseCommands, parentCommands },
-        params,
-        prevVerseTitle
-      );
-      bookVerseActual += verseCommands.length;
+      try {
+        await writeChapter(
+          { verseCommands, parentCommands },
+          params,
+          prevVerseTitle
+        );
+        bookVerseActual += verseCommands.length;
+      } finally {
+        prevVerseTitle = verseCommands[verseCommands.length - 1].verseTitle;
+      }
+
+      // Handle linking last book verse to next book verse
+      if (prevBookTitle) {
+        linkBooks(
+          prevBookTitle,
+          bookTitle
+        );
+      }
+      prevBookTitle = bookTitle;
 
       await fs.appendFile(
         logFile,
         `***** BOOK VERSE COUNT: ${verses.length} *****\n***** ACTUAL VERSE COUNT: ${bookVerseActual} *****\n\n`
       );
+      bookIndex++;
     }
     await fs.appendFile(
       logFile,
