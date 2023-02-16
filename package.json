@@ -25,7 +25,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "load-db": "npx ts-node scriptures/load-database.ts"
   },
   "eslintConfig": {
     "extends": [

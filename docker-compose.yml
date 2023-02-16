@@ -1,3 +1,4 @@
+# https://neo4j.com/docs/operations-manual/current/docker/configuration/
 services:
   neo4j:
     image: neo4j
@@ -7,13 +8,18 @@ services:
       - 7474:7474
       - 7687:7687
     volumes:
-      - /Users/devtanc/Docker/volumes/neo4j/conf:/conf
-      - /Users/devtanc/Docker/volumes/neo4j/data:/data
-      - /Users/devtanc/Docker/volumes/neo4j/logs:/logs
-      - /Users/devtanc/Docker/volumes/neo4j/plugins:/plugins
-      - /Users/devtanc/Docker/volumes/neo4j/import:/var/lib/neo4j/import
-    environment: 
+      # - $HOME/Docker/volumes/neo4j/conf:/conf
+      - $HOME/Docker/volumes/neo4j/data:/data
+      - $HOME/Docker/volumes/neo4j/logs:/logs
+      - $HOME/Docker/volumes/neo4j/plugins:/plugins
+      # - $HOME/Docker/volumes/neo4j/backups:/backups
+      - $HOME/Docker/volumes/neo4j/import:/var/lib/neo4j/import
+    environment:
+      # https://neo4j.com/docs/operations-manual/current/docker/ref-settings/
       # Raise memory limits
-      - NEO4J_server.memory.pagecache.size=8G
-      - NEO4J_server.memory.heap.initial_size=8G
-      - NEO4J_server.memory.heap.max_size=16G
+      - NEO4J_server_memory_pagecache_size=4G
+      - NEO4J_server_memory_heap_initial__size=6G
+      - NEO4J_server_memory_heap_max__size=8G
+      - NEO4J_db_transaction_timeout=180s
+      - NEO4J_db_lock_acquisition_timeout=240s
+      # - NEO4J_server_backup_enabled=true
