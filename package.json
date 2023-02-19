@@ -27,7 +27,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "load-db": "npx ts-node scriptures/load-database.ts",
-    "run-ts": "npx ts-node"
+    "run-ts": "npx ts-node",
+    "dump-db": "./database-scripts/dump.sh",
+    "load-db-dump": "./database-scripts/load.sh"
   },
   "eslintConfig": {
     "extends": [

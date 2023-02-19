@@ -1,8 +1,10 @@
-# https://neo4j.com/docs/operations-manual/current/docker/configuration/
+### https://neo4j.com/docs/operations-manual/current/docker/configuration/
 services:
   neo4j:
     image: neo4j
     restart: unless-stopped
+    stdin_open: true
+    tty: true
     container_name: neo4j-development
     ports:
       - 7474:7474
@@ -12,14 +14,15 @@ services:
       - $HOME/Docker/volumes/neo4j/data:/data
       - $HOME/Docker/volumes/neo4j/logs:/logs
       - $HOME/Docker/volumes/neo4j/plugins:/plugins
-      # - $HOME/Docker/volumes/neo4j/backups:/backups
+      - $HOME/Docker/volumes/neo4j/dumps:/dumps
       - $HOME/Docker/volumes/neo4j/import:/var/lib/neo4j/import
     environment:
-      # https://neo4j.com/docs/operations-manual/current/docker/ref-settings/
-      # Raise memory limits
+      ### https://neo4j.com/docs/operations-manual/current/docker/ref-settings/
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes 
+      ### Raise memory limits
       - NEO4J_server_memory_pagecache_size=4G
       - NEO4J_server_memory_heap_initial__size=6G
       - NEO4J_server_memory_heap_max__size=8G
+      ###  Configure timeouts
       - NEO4J_db_transaction_timeout=180s
       - NEO4J_db_lock_acquisition_timeout=240s
-      # - NEO4J_server_backup_enabled=true
