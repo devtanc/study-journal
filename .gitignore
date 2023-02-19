@@ -25,3 +25,6 @@ yarn-error.log*
 *.ignore.js
 error.txt
 logs.txt
+references.txt
+matches.txt
+ref.txt
