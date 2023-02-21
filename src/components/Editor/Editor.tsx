@@ -32,7 +32,6 @@ export interface Marker {
 
 export const Editor = React.forwardRef(
   ({ onChange, value, annotations, markers }: EditorProps, ref) => {
-    // TODO: Use the editor session to save the information
     return (
       <AceEditor
         mode="text"
