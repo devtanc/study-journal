@@ -14,12 +14,12 @@ export class CustomHighlightRules extends globalThis.ace.acequire(
       start: [
         {
           token: "scripture",
-          regex: `(?<=^|\\s|\\W)([1-4] )?(${books})\\.? [\\d:-]+(, \\d{1,3}(-\\d{1,3})?(?:(?!:)))*(?=$|\\s|\\W)`,
+          regex: `(?<=^|\\s|\\W)([1-4] )?(${books})\\.? [\\d:–-]+(, \\d{1,3}([–-]\\d{1,3})?(?:(?!:)))*(?=$|\\s|\\W)`,
         },
         {
           token: "scripture.nobook",
           regex:
-            /\d{1,3}:\d{1,3}(-\d{1,3}(?:(?!:))|(, \d{1,3}(-\d{1,3})?(?:(?!:))))*(?=$|\s|\W)/,
+            /\d{1,3}:\d{1,3}([–-]\d{1,3}(?:(?!:))|(, \d{1,3}([–-]\d{1,3})?(?:(?!:))))*(?=$|\s|\W)/,
         },
         {
           token: "keyword.namechrist",
