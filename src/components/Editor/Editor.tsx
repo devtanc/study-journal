@@ -1,8 +1,5 @@
 import React from "react"
-// @ts-ignore
-import AceEditor from "react-ace"
-// @ts-ignore
-import type { IMarker, IAnnotation } from "react-ace/types"
+import AceEditor, { type IAnnotation, type IMarker } from "react-ace"
 import "./editor.css"
 
 import "ace-builds/webpack-resolver"

@@ -1,10 +1,4 @@
 {
-  "ts-node": {
-    "compilerOptions": {
-      "target": "ES2015",
-      "module": "commonjs"
-    },
-  },
   "compilerOptions": {
     "baseUrl": "src",
     "allowJs": true,
@@ -13,11 +7,7 @@
     "forceConsistentCasingInFileNames": true,
     // "isolatedModules": true,
     "jsx": "react-jsx",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": false,
@@ -25,9 +15,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "es5"
+    "target": "ES2015"
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { Editor } from "components/Editor"
-// @ts-ignore
-import type { IMarker, IAnnotation } from "react-ace/types"
+import type { IMarker, IAnnotation } from "react-ace"
 import CustomTextMode from "components/customMode"
 
 const key = "journal"
