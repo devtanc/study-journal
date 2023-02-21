@@ -8,3 +8,10 @@
   border-radius: 3px;
   border-style: inset;
 }
+
+.ace_keyword.ace_namechrist {
+  background-color: rgba(0, 0, 255, 1);
+  border-radius: 3px;
+  border-style: inset;
+  color: white;
+}

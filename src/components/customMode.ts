@@ -1,8 +1,9 @@
 import "ace-builds/src-noconflict/mode-text"
-import { allBookNames, allNouns } from "../lib/naming"
+import { allBookNames, allNouns, namesForChrist } from "../lib/naming"
 
 const books = allBookNames.join("|")
 const names = allNouns.join("|")
+const christNames = namesForChrist.join("|")
 
 export class CustomHighlightRules extends globalThis.ace.acequire(
   "ace/mode/text_highlight_rules"
@@ -13,7 +14,17 @@ export class CustomHighlightRules extends globalThis.ace.acequire(
       start: [
         {
           token: "scripture",
-          regex: `(?<=^|\\s|\\W)([1-4] )?(${books})\\.? [\\d\\-(:,; ]+(?=$|\\s|\\W)`,
+          regex: `(?<=^|\\s|\\W)([1-4] )?(${books})\\.? [\\d:-]+(, \\d{1,3}(-\\d{1,3})?(?:(?!:)))*(?=$|\\s|\\W)`,
+        },
+        {
+          token: "scripture.nobook",
+          regex:
+            /\d{1,3}:\d{1,3}(-\d{1,3}(?:(?!:))|(, \d{1,3}(-\d{1,3})?(?:(?!:))))*(?=$|\s|\W)/,
+        },
+        {
+          token: "keyword.namechrist",
+          regex: `(?<=^|\\s|\\W)(${christNames})(?=$|\\W|\\s[^\\d]|\\d)`,
+          caseInsensitive: true,
         },
         {
           token: "keyword.name",
