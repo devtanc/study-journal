@@ -1,0 +1,10 @@
+.test-marker {
+  border: 1px solid cyan;
+  position: absolute;
+}
+
+.ace_scripture {
+  background-color: rgba(255, 0, 0, 0.15);
+  border-radius: 3px;
+  border-style: inset;
+}
