@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react"
-import { Editor, Annotation, Marker } from "components/Editor"
+import { Editor } from "components/Editor"
+// @ts-ignore
+import type { IMarker, IAnnotation } from "react-ace/types"
 import CustomTextMode from "components/customMode"
 
 const key = "journal"
-const markerTest = {
+const markerTest: IMarker = {
   startRow: 0,
   endRow: 0,
   startCol: 0,
@@ -12,12 +14,19 @@ const markerTest = {
   className: "test-marker",
 }
 
+const annotationTest: IAnnotation = {
+  row: 0,
+  column: 4,
+  text: "reference",
+  type: "info",
+}
+
 export const Home = () => {
   const [value, setValue] = useState(localStorage.getItem(key) ?? "")
-  const [annotations, setAnnotations] = useState<Annotation[]>([
-    { row: 0, column: 4, text: "reference", type: "info" },
+  const [annotations, setAnnotations] = useState<IAnnotation[]>([
+    annotationTest,
   ])
-  const [markers, setMarkers] = useState<Marker[]>([])
+  const [markers, setMarkers] = useState<IMarker[]>([])
   const editorComponent = useRef()
 
   useEffect(() => {

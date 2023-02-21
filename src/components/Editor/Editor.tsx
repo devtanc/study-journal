@@ -1,6 +1,8 @@
 import React from "react"
 // @ts-ignore
 import AceEditor from "react-ace"
+// @ts-ignore
+import type { IMarker, IAnnotation } from "react-ace/types"
 import "./editor.css"
 
 import "ace-builds/webpack-resolver"
@@ -11,24 +13,8 @@ import "ace-builds/src-noconflict/theme-solarized_light"
 interface EditorProps {
   onChange: any
   value: string
-  annotations?: Annotation[]
-  markers?: any[]
-}
-
-export interface Annotation {
-  row: number
-  column: number
-  text: string
-  type: "error" | "warning" | "info"
-}
-
-export interface Marker {
-  startRow: number
-  startCol: number
-  endRow: number
-  endCol: number
-  type: "text" | "fullLine" | "screenLine"
-  className: string
+  annotations?: IAnnotation[]
+  markers?: IMarker[]
 }
 
 export const Editor = React.forwardRef(
