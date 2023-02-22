@@ -20,7 +20,7 @@ const annotationTest: IAnnotation = {
   row: 0,
   column: 4,
   text: "reference",
-  type: "info",
+  type: "warning",
 }
 
 type Range = {
@@ -52,14 +52,26 @@ export const Home = () => {
   const [annotations, setAnnotations] = useState<IAnnotation[]>([
     annotationTest,
   ])
-  const [markers, setMarkers] = useState<IMarker[]>([])
+  const [markers, setMarkers] = useState<IMarker[]>([markerTest])
   const editorComponent = useRef<ReactAce>(null)
   const [scriptures, setScriptures] = useState<string[]>([])
 
   useEffect(() => {
     if (!editorComponent.current) return
+    const editor = editorComponent.current.editor
+    const session = editor.getSession()
     const customMode = new CustomTextMode() as any as Ace.SyntaxMode
-    editorComponent.current.editor.getSession().setMode(customMode)
+    session.setMode(customMode)
+
+    const handleMouseMove = (test: any) => {
+      const position = editor.renderer.pixelToScreenCoordinates(test.x, test.y)
+      console.log(position)
+      const token = session.getTokenAt(position.row, position.column)
+      console.log(token)
+    }
+
+    editor.on("mousemove", handleMouseMove)
+    return () => editor.removeEventListener("mousemove", handleMouseMove)
   }, [editorComponent])
 
   const handleChange = (text: string, actionInfo: ActionInfo) => {
