@@ -5,6 +5,13 @@ const books = allBookNames.join("|")
 const names = allNouns.join("|")
 const christNames = namesForChrist.join("|")
 
+export enum TokenNames {
+  ScriptureReferenceWithbook = "scripture.reference.withbook",
+  ScriptureReferenceNobook = "scripture.reference.nobook",
+  KeywordNamechrist = "keyword.namechrist",
+  KeywordName = "keyword.name",
+}
+
 export class CustomHighlightRules extends globalThis.ace.acequire(
   "ace/mode/text_highlight_rules"
 ).TextHighlightRules {
@@ -13,21 +20,21 @@ export class CustomHighlightRules extends globalThis.ace.acequire(
     this.$rules = {
       start: [
         {
-          token: "scripture.reference.withbook",
-          regex: `(?<=^|\\s|\\W)(${books})\\.? [\\d:–-]+(, \\d{1,3}([–-]\\d{1,3})?(?:(?!:)))*(?=$|\\s|\\W)`,
+          token: TokenNames.ScriptureReferenceWithbook,
+          regex: `(?<=^|\\s|\\W)(${books})\\.? \\d{1,3}(:\\d{1,3})?(?:(?!:))([–-]\\d{1,3})?(?:(?!-))(, \\d{1,3}([–-]\\d{1,3})?(?:(?!:)))*(?=$|\\s|\\W)`,
         },
         {
-          token: "scripture.reference.nobook",
+          token: TokenNames.ScriptureReferenceNobook,
           regex:
-            /\d{1,3}:\d{1,3}([–-]\d{1,3}(?:(?!:))|(, \d{1,3}([–-]\d{1,3})?(?:(?!:))))*(?=$|\s|\W)/,
+            /\d{1,3}:\d{1,3}([–-]\d{1,3}(?:(?!:))|(, \d{1,3}([–-]\d{1,3})?(?:(?!:))))*(?:(?!-))(?=$|\s|\W)/,
         },
         {
-          token: "keyword.namechrist",
+          token: TokenNames.KeywordNamechrist,
           regex: `(?<=^|\\s|\\W)(${christNames})(?=$|\\W|\\s[^\\d]|\\d)`,
           caseInsensitive: true,
         },
         {
-          token: "keyword.name",
+          token: TokenNames.KeywordName,
           regex: `(?<=^|\\s|\\W)(${names})(?=$|\\W|\\s[^\\d]|\\d)`,
           caseInsensitive: true,
         },
