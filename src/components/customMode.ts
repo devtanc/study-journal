@@ -6,18 +6,19 @@ const names = allNouns.join("|")
 const christNames = namesForChrist.join("|")
 
 export enum TokenNames {
+  ConferenceTalk = "url.conference.talk",
+  UrlYoutube = "url.youtube",
+  UrlGeneral = "url.general",
   ScriptureReferenceWithbook = "scripture.reference.withbook",
   ScriptureReferenceNobook = "scripture.reference.nobook",
   KeywordNamechrist = "keyword.namechrist",
   KeywordName = "keyword.name",
 }
 
-const noBookRegex =
-  /\d{1,3}:\d{1,3}(-\d{1,3})?(, \d{1,3}(?:(?!:\d))(-\d{1,3})?)*(?:(?!\d))/
+const noBookRegex = /\d{1,3}:\d{1,3}(-\d{1,3})?(, \d{1,3}(?:(?!:\d))(-\d{1,3})?)*(?:(?!\d))/
 const noBookString = noBookRegex.toString().slice(1, -1)
-export class CustomHighlightRules extends ace.require(
-  "ace/mode/text_highlight_rules"
-).TextHighlightRules {
+export class CustomHighlightRules extends ace.require("ace/mode/text_highlight_rules")
+  .TextHighlightRules {
   constructor() {
     super()
     this.$rules = {
@@ -29,6 +30,20 @@ export class CustomHighlightRules extends ace.require(
         {
           token: TokenNames.ScriptureReferenceNobook,
           regex: noBookRegex,
+        },
+        {
+          token: TokenNames.ConferenceTalk,
+          regex:
+            /https?:\/\/(www\.)?churchofjesuschrist.org\/study\/general-conference\/\d+\/\d+\/[\d\w]+\?[\d\w._~=?-]+/,
+        },
+        {
+          token: TokenNames.UrlYoutube,
+          regex: /https?:\/\/(www\.)?youtube.com\/watch\?[-a-zA-Z0-9()@:%_+.~#?&/=]*/,
+        },
+        {
+          token: TokenNames.UrlGeneral,
+          regex:
+            /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=:]{1,256}(\.[a-zA-Z0-9()]{1,6}\b)?[-a-zA-Z0-9()@:%_+.~#?&/=]*/,
         },
         {
           token: TokenNames.KeywordNamechrist,
