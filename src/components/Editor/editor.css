@@ -15,3 +15,18 @@
   border-style: inset;
   color: white;
 }
+
+.ace_url.ace_general {
+  text-decoration: underline;
+  color: cornflowerblue;
+}
+
+.ace_url.ace_youtube {
+  text-decoration: underline;
+  color: firebrick;
+}
+
+.ace_url.ace_conference.ace_talk {
+  text-decoration: underline;
+  color: cadetblue;
+}
