@@ -21,7 +21,7 @@ export class CustomHighlightRules extends globalThis.ace.acequire(
       start: [
         {
           token: TokenNames.ScriptureReferenceWithbook,
-          regex: `(?<=^|\\s|\\W)(${books})\\.? \\d{1,3}(:\\d{1,3})?(?:(?!:))([–-]\\d{1,3})?(?:(?!-))(, \\d{1,3}([–-]\\d{1,3})?(?:(?!:)))*(?=$|\\s|\\W)`,
+          regex: `(?<=^|\\s|\\W)(${books})\\.? \\d{1,3}(:\\d{1,3})?(?:(?!:))([–-]\\d{1,3})?(?:(?!-))(, \\d{1,3}([–-]\\d{1,3})?(?:(?!:)))*(?:(?!-))(?=$|\\s|\\W)`,
         },
         {
           token: TokenNames.ScriptureReferenceNobook,
