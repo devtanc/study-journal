@@ -43,6 +43,27 @@ interface Token extends Ace.Token {
 }
 
 const bookNameMatch = `/^${allBookNames.join("|")}(?=\\. )/`
+const processTokens = (tokens: Token[]): Token[] =>
+  tokens
+    .filter((token) => token.type.startsWith("scripture.reference"))
+    .map((token, index, tokens) => {
+      if (token.type === TokenNames.ScriptureReferenceNobook) {
+        for (let i = index; i >= 0; i--) {
+          if (tokens[i]?.type === TokenNames.ScriptureReferenceWithbook) {
+            const [book] = tokens[i].value.match(bookNameMatch) ?? []
+            if (!book) continue
+
+            return {
+              ...token,
+              value: `${book} ${token.value}`,
+              type: TokenNames.ScriptureReferenceWithbook,
+            }
+          }
+        }
+        return { ...token }
+      }
+      return { ...token }
+    })
 
 export const Home = () => {
   const editorComponent = useRef<ReactAce>(null)
@@ -55,58 +76,30 @@ export const Home = () => {
 
   const handleChange = useCallback(
     (text: string, actionInfo: ActionInfo) => {
-      const processTokens = (tokens: Token[]): Token[] =>
-        tokens
-          .filter((token) => token.type.startsWith("scripture.reference"))
-          .map((token, index, tokens) => {
-            if (token.type === TokenNames.ScriptureReferenceNobook) {
-              for (let i = index; i >= 0; i--) {
-                if (tokens[i]?.type === TokenNames.ScriptureReferenceWithbook) {
-                  const [book] = tokens[i].value.match(bookNameMatch) ?? []
-                  if (!book) continue
-
-                  return {
-                    ...token,
-                    value: `${book} ${token.value}`,
-                    type: TokenNames.ScriptureReferenceWithbook,
-                  }
-                }
-              }
-              return { ...token }
-            }
-            return { ...token }
-          })
-
       localStorage.setItem(key, text)
       setEditorText(text.includes("–") ? text.replace(/–/g, "-") : text)
 
       if (editorComponent.current) {
         const session = editorComponent.current.editor.getSession()
-        let scriptures: Token[][] = []
+        const { start, end, lines } = actionInfo
 
-        switch (actionInfo.action) {
-          case "insert": {
-            const { start, end } = actionInfo
-            for (let row = start.row; row <= end.row; row++) {
-              scriptures[row] = processTokens(session.getTokens(row) as Token[])
-            }
-            break
-          }
-          case "remove": {
-            const { start } = actionInfo
-            scriptures[start.row] = processTokens(session.getTokens(start.row) as Token[])
-            break
-          }
+        if (start.row === end.row && lines.length === 1) {
+          const tokens = session.getTokens(start.row) as Token[]
+          return setScriptures((current) => {
+            current[0 + start.row] = tokens
+            return [...current]
+          })
         }
 
-        setScriptures((current) => {
-          scriptures.forEach((rowTokens, i) => {
-            if (rowTokens) {
-              current[i] = rowTokens
-            }
-          })
-          return [...current]
-        })
+        let tokenRows: Token[][] = []
+        const endRow = session.getLength()
+        // Process everything after the starting row
+        for (let row = start.row; row <= endRow; row++) {
+          tokenRows.push(processTokens(session.getTokens(row) as Token[]))
+        }
+
+        console.log(start.row, tokenRows.length)
+        return setScriptures((current) => [...current.slice(0, start.row), ...tokenRows])
       }
     },
     [editorComponent]
@@ -118,7 +111,9 @@ export const Home = () => {
     const session = editor.getSession()
     const customMode = new StudyJournalMode() as any as Ace.SyntaxMode
     session.setMode(customMode)
-    session.setValue(localStorage.getItem(key) ?? "")
+
+    const text = localStorage.getItem(key)
+    session.setValue(text ?? "")
 
     const languageTools = ace.require("ace/ext/language_tools")
     languageTools.setCompleters([ScriptureCompleter, NameCompleter])
@@ -134,12 +129,12 @@ export const Home = () => {
   }, [editorComponent])
 
   useEffect(() => {
-    console.log(scriptures)
+    console.log(scriptures.slice(0, 5))
   }, [scriptures])
 
-  useEffect(() => {
-    console.debug(currentlyHoveredToken)
-  }, [currentlyHoveredToken])
+  // useEffect(() => {
+  //   console.log(currentlyHoveredToken)
+  // }, [currentlyHoveredToken])
 
   return (
     <div className="flex flex-row">
