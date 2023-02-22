@@ -12,6 +12,9 @@ export enum TokenNames {
   KeywordName = "keyword.name",
 }
 
+const noBookRegex =
+  /\d{1,3}:\d{1,3}(-\d{1,3})?(, \d{1,3}(?:(?!:\d))(-\d{1,3})?)*/
+const noBookString = noBookRegex.toString().slice(1, -1)
 export class CustomHighlightRules extends ace.require(
   "ace/mode/text_highlight_rules"
 ).TextHighlightRules {
@@ -21,12 +24,11 @@ export class CustomHighlightRules extends ace.require(
       start: [
         {
           token: TokenNames.ScriptureReferenceWithbook,
-          regex: `(?<=^|\\s|\\W)(${books})\\.? \\d{1,3}(:\\d{1,3})?(?:(?!:))([–-]\\d{1,3})?(?:(?!-))(, \\d{1,3}([–-]\\d{1,3})?(?:(?!:)))*(?:(?!-))(?=$|\\s|\\W)`,
+          regex: `(?<=^|\\s|\\W)(${books})\\.? ${noBookString}`,
         },
         {
           token: TokenNames.ScriptureReferenceNobook,
-          regex:
-            /\d{1,3}:\d{1,3}([–-]\d{1,3}(?:(?!:))|(, \d{1,3}([–-]\d{1,3})?(?:(?!:))))*(?:(?!-))(?=$|\s|\W)/,
+          regex: noBookRegex,
         },
         {
           token: TokenNames.KeywordNamechrist,
