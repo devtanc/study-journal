@@ -13,7 +13,7 @@ export enum TokenNames {
 }
 
 const noBookRegex =
-  /\d{1,3}:\d{1,3}(-\d{1,3})?(, \d{1,3}(?:(?!:\d))(-\d{1,3})?)*/
+  /\d{1,3}:\d{1,3}(-\d{1,3})?(, \d{1,3}(?:(?!:\d))(-\d{1,3})?)*(?:(?!\d))/
 const noBookString = noBookRegex.toString().slice(1, -1)
 export class CustomHighlightRules extends ace.require(
   "ace/mode/text_highlight_rules"
