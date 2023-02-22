@@ -17,7 +17,7 @@ export enum TokenNames {
 
 const noBookRegex = /\d{1,3}:\d{1,3}(-\d{1,3})?(, \d{1,3}(?:(?!:\d))(-\d{1,3})?)*(?:(?!\d))/
 const noBookString = noBookRegex.toString().slice(1, -1)
-export class CustomHighlightRules extends ace.require("ace/mode/text_highlight_rules")
+export class StudyJournalHighlightRules extends ace.require("ace/mode/text_highlight_rules")
   .TextHighlightRules {
   constructor() {
     super()
@@ -60,9 +60,9 @@ export class CustomHighlightRules extends ace.require("ace/mode/text_highlight_r
   }
 }
 
-export default class CustomTextMode extends ace.require("ace/mode/text").Mode {
+export default class StudyJournalMode extends ace.require("ace/mode/text").Mode {
   constructor() {
     super()
-    this.HighlightRules = CustomHighlightRules
+    this.HighlightRules = StudyJournalHighlightRules
   }
 }
