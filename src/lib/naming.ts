@@ -182,7 +182,7 @@ export const shortBookNames = [
 ]
 
 // https://en.wikipedia.org/wiki/List_of_Book_of_Mormon_people
-export const names = [
+export const characterNames = [
   "Aaron",
   "Abinadi",
   "Abinadom",
@@ -379,5 +379,8 @@ export const nouns = [
   "church",
 ]
 
-export const allNouns = [...names, ...namesForChrist, ...nouns]
+export const allNouns = [...characterNames, ...namesForChrist, ...nouns]
 export const allBookNames = [...longBookNames, ...shortBookNames]
+export const allBookNamesWithoutNumbers = [...longBookNames, ...shortBookNames].map((name) =>
+  name.replace(/\d /, "")
+)
