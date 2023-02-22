@@ -8,7 +8,9 @@ export const ScriptureCompleter: Ace.Completer = {
       return
     }
 
-    const matches = allBookNamesWithoutNumbers.filter((name) => name.startsWith(prefix))
+    const matches = allBookNamesWithoutNumbers.filter((name) =>
+      name.toLowerCase().startsWith(prefix.toLowerCase())
+    )
     callback(
       null,
       matches.map(
@@ -28,7 +30,9 @@ export const NameCompleter: Ace.Completer = {
       return
     }
 
-    const matches = characterNames.filter((name) => name.startsWith(prefix))
+    const matches = characterNames.filter((name) =>
+      name.toLowerCase().startsWith(prefix.toLowerCase())
+    )
     callback(
       null,
       matches.map(
