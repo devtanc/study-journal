@@ -1,4 +1,4 @@
-import "ace-builds/src-noconflict/mode-text"
+import ace from "ace-builds"
 import { allBookNames, allNouns, namesForChrist } from "../lib/naming"
 
 const books = allBookNames.join("|")
@@ -12,7 +12,7 @@ export enum TokenNames {
   KeywordName = "keyword.name",
 }
 
-export class CustomHighlightRules extends globalThis.ace.acequire(
+export class CustomHighlightRules extends ace.require(
   "ace/mode/text_highlight_rules"
 ).TextHighlightRules {
   constructor() {
@@ -43,9 +43,7 @@ export class CustomHighlightRules extends globalThis.ace.acequire(
   }
 }
 
-export default class CustomTextMode extends globalThis.ace.acequire(
-  "ace/mode/text"
-).Mode {
+export default class CustomTextMode extends ace.require("ace/mode/text").Mode {
   constructor() {
     super()
     this.HighlightRules = CustomHighlightRules

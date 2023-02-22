@@ -1,4 +1,5 @@
 import React from "react"
+import ReactAce from "react-ace/lib/ace"
 import AceEditor, { type IAnnotation, type IMarker } from "react-ace"
 import "./editor.css"
 
@@ -14,27 +15,28 @@ interface EditorProps {
   markers?: IMarker[]
 }
 
-export const Editor = React.forwardRef(
-  ({ onChange, value, annotations, markers }: EditorProps, ref) => {
+export const Editor = React.forwardRef<ReactAce, EditorProps>(
+  ({ onChange, value, annotations, markers }, ref) => {
     return (
       <AceEditor
-        mode="text"
-        theme="solarized_light"
-        name="ace-editor"
-        onChange={onChange}
+        annotations={annotations}
         editorProps={{ $blockScrolling: true }}
         enableBasicAutocompletion={false}
         enableLiveAutocompletion={false}
         enableSnippets={false}
-        wrapEnabled={true}
-        value={value}
-        style={{ width: "100%", height: "100%" }}
-        fontSize={14}
-        annotations={annotations}
-        markers={markers}
         focus
-        // @ts-ignore
+        fontSize={14}
+        highlightActiveLine={false}
+        markers={markers}
+        mode="text"
+        name="ace-editor"
+        onChange={onChange}
         ref={ref}
+        showGutter={false}
+        style={{ width: "100%", height: "100%" }}
+        theme="solarized_light"
+        value={value}
+        wrapEnabled={true}
       />
     )
   }
