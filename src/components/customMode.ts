@@ -15,8 +15,8 @@ export enum TokenNames {
   KeywordName = "keyword.name",
 }
 
-const noBookRegex = /\d{1,3}:\d{1,3}(-\d{1,3})?(, \d{1,3}(?:(?!:\d))(-\d{1,3})?)*(?:(?!\d))/
-const noBookString = noBookRegex.toString().slice(1, -1)
+const noBookRegex = /\d{1,3}:\d{1,3}(-\d{1,3})?(, \d{1,3}(?:(?!:\d| ))(-\d{1,3})?)*(?:(?!\d))/
+const noBookRegexString = noBookRegex.toString().slice(1, -1)
 export class StudyJournalHighlightRules extends ace.require("ace/mode/text_highlight_rules")
   .TextHighlightRules {
   constructor() {
@@ -25,7 +25,7 @@ export class StudyJournalHighlightRules extends ace.require("ace/mode/text_highl
       start: [
         {
           token: TokenNames.ScriptureReferenceWithbook,
-          regex: `(?<=^|\\s|\\W)(${books})\\.? ${noBookString}`,
+          regex: `(?<=^|\\s|\\W)(${books})\\.? ${noBookRegexString}`,
         },
         {
           token: TokenNames.ScriptureReferenceNobook,
