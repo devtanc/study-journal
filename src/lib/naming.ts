@@ -384,3 +384,6 @@ export const allBookNames = [...longBookNames, ...shortBookNames]
 export const allBookNamesWithoutNumbers = [...longBookNames, ...shortBookNames].map((name) =>
   name.replace(/\d /, "")
 )
+export const longBookNamesWithoutNumbers = [
+  ...new Set(longBookNames.map((name) => name.replace(/\d /, ""))),
+]
