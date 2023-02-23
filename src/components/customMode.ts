@@ -34,7 +34,7 @@ export class StudyJournalHighlightRules extends ace.require("ace/mode/text_highl
         {
           token: TokenNames.ConferenceTalk,
           regex:
-            /https?:\/\/(www\.)?churchofjesuschrist.org\/study\/general-conference\/\d+\/\d+\/[\d\w]+\?[\d\w._~=?-]+/,
+            /https?:\/\/(www\.)?churchofjesuschrist.org\/study\/(general-conference|ensign)[-a-zA-Z0-9()@:%_+.~#?&/=]*/,
         },
         {
           token: TokenNames.UrlYoutube,
@@ -43,7 +43,7 @@ export class StudyJournalHighlightRules extends ace.require("ace/mode/text_highl
         {
           token: TokenNames.UrlGeneral,
           regex:
-            /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=:]{1,256}(\.[a-zA-Z0-9()]{1,6}\b)?[-a-zA-Z0-9()@:%_+.~#?&/=]*/,
+            /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}(\.[a-zA-Z0-9()]{1,6}\b)?[-a-zA-Z0-9()@:%_+.~#?&/=]*/,
         },
         {
           token: TokenNames.KeywordNamechrist,
