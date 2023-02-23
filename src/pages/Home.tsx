@@ -60,9 +60,8 @@ const processTokens = (tokens: Token[]): Token[] =>
             }
           }
         }
-        return { ...token }
       }
-      return { ...token }
+      return token
     })
 
 export const Home = () => {
@@ -98,7 +97,6 @@ export const Home = () => {
           tokenRows.push(processTokens(session.getTokens(row) as Token[]))
         }
 
-        console.log(start.row, tokenRows.length)
         return setScriptures((current) => [...current.slice(0, start.row), ...tokenRows])
       }
     },
@@ -128,17 +126,17 @@ export const Home = () => {
     return () => editor.removeEventListener("mousemove", handleMouseMove)
   }, [editorComponent])
 
-  useEffect(() => {
-    console.log(scriptures.slice(0, 5))
-  }, [scriptures])
+  // useEffect(() => {
+  //   console.log(scriptures.slice(0, 25))
+  // }, [scriptures])
 
   // useEffect(() => {
   //   console.log(currentlyHoveredToken)
   // }, [currentlyHoveredToken])
 
   return (
-    <div className="flex flex-row">
-      <div className="w-9/12 px-4 pt-4 h-100 ace-solarized-light">
+    <div className="flex flex-row h-full">
+      <div className="w-full px-4 pt-4 ace-solarized-light">
         <Editor
           onChange={handleChange}
           value={editorText}
@@ -146,13 +144,6 @@ export const Home = () => {
           markers={markers}
           ref={editorComponent}
         />
-      </div>
-      <div className="w-3/12 h-screen p-4">
-        {/* <ReactMarkdown
-          className="markdown"
-          children={value}
-          remarkPlugins={[remarkGfm]}
-        /> */}
       </div>
     </div>
   )

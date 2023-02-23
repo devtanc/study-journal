@@ -3,9 +3,9 @@ import { Home } from "./pages/Home"
 
 function App() {
   return (
-    <>
+    <div className="flex flex-col justify-between h-screen">
       <Home />
-      <div className="m-16 text-xs text-slate-400">
+      <div className="h-16 m-4 text-xs text-slate-400">
         <i>
           The products (services) offered on this site are neither made, provided, approved nor
           endorsed by Intellectual Reserve, Inc. or The Church of Jesus Christ of Latter-day Saints.
@@ -14,7 +14,7 @@ function App() {
           Inc. or The Church of Jesus Christ of Latter-day Saints.
         </i>
       </div>
-    </>
+    </div>
   )
 }
 
