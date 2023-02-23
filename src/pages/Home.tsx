@@ -109,6 +109,7 @@ export const Home = () => {
     const session = editor.getSession()
     const customMode = new StudyJournalMode() as any as Ace.SyntaxMode
     session.setMode(customMode)
+    session.setOption("indentedSoftWrap", false)
 
     const text = localStorage.getItem(key)
     session.setValue(text ?? "")
@@ -116,10 +117,17 @@ export const Home = () => {
     const languageTools = ace.require("ace/ext/language_tools")
     languageTools.setCompleters([ScriptureCompleter, NameCompleter])
 
-    const handleMouseMove = (test: any) => {
-      const position = editor.renderer.pixelToScreenCoordinates(test.x, test.y)
-      const token = session.getTokenAt(position.row, position.column)
-      setCurrentlyHoveredToken(token as Token)
+    const handleMouseMove = (event: any) => {
+      // This isn't giving the correct position when the text is wrapped... :|
+      const position = editor.renderer.pixelToScreenCoordinates(event.x, event.y)
+      const token = session.getTokenAt(position.row, position.column) as Token | null
+      setCurrentlyHoveredToken((current) => {
+        if (current === null && token === null) return current
+        if (current?.type === token?.type && current?.value === token?.value) {
+          return current
+        }
+        return token
+      })
     }
 
     editor.on("mousemove", handleMouseMove)
@@ -136,7 +144,7 @@ export const Home = () => {
 
   return (
     <div className="flex flex-row h-full">
-      <div className="w-full px-4 pt-4 ace-solarized-light">
+      <div className="w-9/12 ace-solarized-light">
         <Editor
           onChange={handleChange}
           value={editorText}
@@ -145,6 +153,7 @@ export const Home = () => {
           ref={editorComponent}
         />
       </div>
+      <div className="w-3/12"></div>
     </div>
   )
 }

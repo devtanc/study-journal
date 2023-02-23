@@ -32,9 +32,9 @@ export const Editor = React.forwardRef<ReactAce, EditorProps>(
         onChange={onChange}
         value={value}
         highlightActiveLine={false}
-        // enableBasicAutocompletion
+        wrapEnabled
+        enableBasicAutocompletion
         enableLiveAutocompletion
-        wrapEnabled={true}
         enableSnippets
         focus
       />
