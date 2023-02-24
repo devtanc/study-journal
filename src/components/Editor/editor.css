@@ -1,5 +1,6 @@
-.test-marker {
-  border: 1px solid cyan;
+.reference_error {
+  border-bottom: 2px dashed red;
+  border-radius: 0;
   position: absolute;
 }
 
