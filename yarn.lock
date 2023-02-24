@@ -1808,6 +1808,11 @@
   resolved "https://registry.yarnpkg.com/@trysound/sax/-/sax-0.2.0.tgz#cccaab758af56761eb7bf37af6f03f326dd798ad"
   integrity sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==
 
+"@tsconfig/create-react-app@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@tsconfig/create-react-app/-/create-react-app-1.0.3.tgz#2dd6ef3adb18a551b3e13aee5d18efe517069d4b"
+  integrity sha512-sAsKAmKzWJlLWpCTyaUHUhqkQEAGAIaNs90sVbZsBhqBTNTnLkcZUr7U5HLI9EUN8QppfkxfGjvaATSgZQhiGQ==
+
 "@types/aria-query@^5.0.1":
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/@types/aria-query/-/aria-query-5.0.1.tgz#3286741fb8f1e1580ac28784add4c7a1d49bdfbc"
