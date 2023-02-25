@@ -5,16 +5,16 @@
 }
 
 .ace_scripture {
-  background-color: rgba(255, 0, 0, 0.15);
-  border-radius: 3px;
-  border-style: inset;
+  color: #cd3030cc;
+  font-weight: bold;
+}
+
+.ace_keyword.ace_name {
+  color: #7d2e5f;
 }
 
 .ace_keyword.ace_namechrist {
-  background-color: rgba(0, 0, 255, 1);
-  border-radius: 3px;
-  border-style: inset;
-  color: white;
+  color: #6666ff;
 }
 
 .ace_url.ace_general {
@@ -24,7 +24,7 @@
 
 .ace_url.ace_youtube {
   text-decoration: underline;
-  color: firebrick;
+  color: #d17625;
 }
 
 .ace_url.ace_conference.ace_talk {

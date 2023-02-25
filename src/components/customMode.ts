@@ -45,16 +45,16 @@ export class StudyJournalHighlightRules extends ace.require("ace/mode/text_highl
           regex:
             /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}(\.[a-zA-Z0-9()]{1,6}\b)?[-a-zA-Z0-9()@:%_+.~#?&/=]*/,
         },
-        {
-          token: TokenNames.KeywordNamechrist,
-          regex: `(?<=^|\\s|\\W)(${christNames})(?=$|\\W|\\s[^\\d]|\\d)`,
-          caseInsensitive: true,
-        },
-        {
-          token: TokenNames.KeywordName,
-          regex: `(?<=^|\\s|\\W)(${names})(?=$|\\W|\\s[^\\d]|\\d)`,
-          caseInsensitive: true,
-        },
+        // {
+        //   token: TokenNames.KeywordNamechrist,
+        //   regex: `(?<=^|\\s|\\W)(${christNames})(?=$|\\W|\\s[^\\d]|\\d)`,
+        //   caseInsensitive: true,
+        // },
+        // {
+        //   token: TokenNames.KeywordName,
+        //   regex: `(?<=^|\\s|\\W)(${names})(?=$|\\W|\\s[^\\d]|\\d)`,
+        //   caseInsensitive: true,
+        // },
       ],
     }
   }
