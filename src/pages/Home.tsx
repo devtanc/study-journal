@@ -7,8 +7,9 @@ import { Editor } from "components/Editor"
 import StudyJournalMode, { TokenNames } from "components/customMode"
 import { NameCompleter, ScriptureCompleter } from "components/customCompletions"
 import { allBookNames, shortToLongNameMap } from "lib/naming"
-import { matchReference, matchVerse } from "lib/regex"
+import { matchReference, matchVerseGlobal } from "lib/regex"
 import { bookChapterVersesMap } from "lib/bookStatistics"
+import { v4 } from "uuid"
 
 type AdjustedRegex = RegExpExecArray & { groups: { [key: string]: string } }
 
@@ -54,6 +55,7 @@ interface Reference {
   verseString: string
   verses?: number[]
   matches?: (number | number[])[]
+  error?: string
 }
 
 interface TokenError {
@@ -61,6 +63,10 @@ interface TokenError {
   row: number
   col: number
   length: number
+}
+
+interface TokenErrorsByRow {
+  [key: string]: TokenError[]
 }
 
 const bookNameMatch = `/^${allBookNames.join("|")}(?=\\. )/`
@@ -83,27 +89,48 @@ const processTokens = (tokens: Token[]): Token[] =>
     return token
   })
 
-const processVerseString = (str: string): { verses: number[]; matches: Reference["matches"] } => {
+const processVerseString = (
+  str: string,
+  book: string,
+  chapter: number
+): { verses: number[]; matches: Reference["matches"]; error: Reference["error"] } => {
   let inRange = false
   let matchStr: string | undefined | null = null
   let lastMatch: number | null = null
+  let error = ""
+  const maxVerseCount = bookChapterVersesMap?.[book]?.[chapter]
 
   const result: Reference["verses"] = []
   const matches: Reference["matches"] = []
+  if (!maxVerseCount) {
+    return { verses: result, matches, error: "Invalid book or chapter selection" }
+  }
+
+  matchVerseGlobal.lastIndex = 0
 
   do {
-    ;[matchStr] = matchVerse.exec(str) ?? []
+    ;[matchStr] = matchVerseGlobal.exec(str) ?? []
     if (!matchStr) continue
     const match = parseInt(matchStr)
+    if (match > maxVerseCount) {
+      return {
+        verses: result,
+        matches,
+        error: "Invalid verse selection or verse selection out of range",
+      }
+    }
 
     if (inRange && lastMatch) {
       for (let i = lastMatch; i <= match; i++) {
         result.push(i)
       }
       matches.push([lastMatch, match])
+      if (match <= lastMatch) {
+        return { verses: result, matches, error: "Invalid range of verses" }
+      }
       lastMatch = null
     } else {
-      inRange = str[matchVerse.lastIndex] === "-"
+      inRange = str[matchVerseGlobal.lastIndex] === "-"
       if (!inRange) {
         result.push(match)
         matches.push(match)
@@ -112,49 +139,54 @@ const processVerseString = (str: string): { verses: number[]; matches: Reference
     }
   } while (matchStr)
 
-  matchVerse.lastIndex = 0
-  return { verses: result, matches }
+  return { verses: result, matches, error }
 }
 
 const processReferenceString = (reference: string): Reference => {
   const result = matchReference.exec(reference) as AdjustedRegex
-  const { book, chapter, verseString } = result.groups ?? {}
+  const { book: dirtyBook, chapter: chapterStr, verseString } = result.groups ?? {}
+  const book = shortToLongNameMap?.[dirtyBook] ?? dirtyBook
+  const chapter = parseInt(chapterStr)
 
-  const { verses, matches } = processVerseString(verseString)
+  const { verses, matches, error } = processVerseString(verseString, book, chapter)
 
   return {
-    book: shortToLongNameMap[book] ?? book,
-    chapter: parseInt(chapter),
+    book,
+    chapter,
     verseString,
     verses,
     matches,
+    error,
   }
 }
 
 export const Home = () => {
   const editorComponent = useRef<ReactAce>(null)
 
-  const [editorText, setEditorText] = useState("")
+  // const [currentlyHoveredToken, setCurrentlyHoveredToken] = useState<Token | null>(null)
+  const [editorText, setEditorText] = useState<string>("")
   const [annotations, setAnnotations] = useState<IAnnotation[]>([annotationTest])
   const [markers, setMarkers] = useState<IMarker[]>([markerTest])
+  const [actionInfo, setActionInfo] = useState<ActionInfo>()
+
   const [scriptureTokenRows, setScriptureTokenRows] = useState<Token[][]>([])
-  const [currentlyHoveredToken, setCurrentlyHoveredToken] = useState<Token | null>(null)
-  const [tokenErrors, setTokenErrors] = useState<TokenError[]>([])
-  const [normalizedReferences, setNormalizedReferences] = useState<Reference[]>([])
+  const [tokenErrors, setTokenErrors] = useState<TokenErrorsByRow>({})
+  const [normalizedReferences, setNormalizedReferences] = useState<string[]>([])
 
   const handleChange = useCallback(
     (text: string, actionInfo: ActionInfo) => {
       localStorage.setItem(key, text)
       setEditorText(text.includes("–") ? text.replace(/–/g, "-") : text)
+      setActionInfo(actionInfo)
 
       if (editorComponent.current) {
         const session = editorComponent.current.editor.getSession()
         const { start, end, lines } = actionInfo
 
         if (start.row === end.row && lines.length === 1) {
-          const tokens = session.getTokens(start.row) as Token[]
+          const tokens = processTokens(session.getTokens(start.row) as Token[])
           return setScriptureTokenRows((current) => {
-            current[0 + start.row] = tokens
+            current[start.row] = tokens
             return [...current]
           })
         }
@@ -165,8 +197,7 @@ export const Home = () => {
         for (let row = start.row; row <= endRow; row++) {
           tokenRows.push(processTokens(session.getTokens(row) as Token[]))
         }
-
-        return setScriptureTokenRows((current) => [...current.slice(0, start.row), ...tokenRows])
+        setScriptureTokenRows((current) => [...current.slice(0, start.row), ...tokenRows])
       }
     },
     [editorComponent]
@@ -206,8 +237,17 @@ export const Home = () => {
 
   useEffect(() => {
     const references: Reference[] = []
-    const errors: TokenError[] = []
-    scriptureTokenRows.forEach((tokens, row) => {
+    // let normalized: string[] = []
+    if (!actionInfo) return
+
+    const endRow =
+      actionInfo.start.row === actionInfo.end.row
+        ? actionInfo.end.row
+        : scriptureTokenRows.length - 1
+    const processedRowErrors: TokenErrorsByRow = {}
+    for (let row = actionInfo.start.row; row <= endRow; row++) {
+      processedRowErrors[row] = []
+      const tokens = scriptureTokenRows[row]
       let col = 0
       tokens.forEach((token) => {
         if (token.type !== TokenNames.ScriptureReferenceWithbook) {
@@ -217,73 +257,66 @@ export const Home = () => {
         const { value, valueWithBook } = token
         const reference = processReferenceString(valueWithBook ?? value)
 
-        let errorMessage = null
-
-        if (!reference.book) {
-          // This should never happen due to regex matching for tokens
-          errorMessage = "Missing or invalid book name"
+        if (!bookChapterVersesMap[reference.book]?.[reference.chapter]) {
+          reference.error = "Invalid chapter or chapter out of range"
         }
-        if (!reference.chapter) {
-          // This should never happen due to regex matching for tokens
-          errorMessage = "Missing chapter"
-        }
-        if (!reference.verseString) {
-          // This should never happen due to regex matching for tokens
-          errorMessage = "Missing or invalid verse selection"
+        if (!reference.verses) {
+          reference.error = "Invalid verse selection or verse selection out of range"
         }
 
-        if (!bookChapterVersesMap[reference.book][reference.chapter]) {
-          errorMessage = "Invalid chapter or chapter out of range"
-        }
-
-        // Is there a way to optimize this?
-        reference.matches?.forEach((match) => {
-          if (
-            Array.isArray(match) &&
-            (match[0] > match[1] ||
-              match.length !== 2 ||
-              match[1] > bookChapterVersesMap[reference.book][reference.chapter])
-          ) {
-            return (errorMessage = "Invalid range of verses")
-          }
-          if (match <= 0 || match > bookChapterVersesMap[reference.book][reference.chapter]) {
-            return (errorMessage = "Specified verse out of range for specified chapter")
-          }
-        })
-
-        if (errorMessage) {
-          errors.push({
-            message: errorMessage,
+        if (reference.error) {
+          processedRowErrors[row].push({
+            message: reference.error,
             col,
             row,
             length: token.value.length,
           })
+        } else {
+          references.push(reference)
         }
 
-        references.push(reference)
         col += token.value.length
       })
-    })
-    // console.log(references)
-    setTokenErrors(errors)
-  }, [scriptureTokenRows])
+    }
+    setTokenErrors((old) => ({ ...old, ...processedRowErrors }))
+  }, [scriptureTokenRows, actionInfo])
 
   // useEffect(() => {
   //   console.log(currentlyHoveredToken)
   // }, [currentlyHoveredToken])
 
+  // useEffect(() => {
+  //   const queries: string[] = []
+  //   const uuids: string[] = []
+  //   normalizedReferences.forEach((reference) => {
+  //     const uuid = `v${v4().substring(0, 8)}`
+  //     queries.push(`MATCH (${uuid}:Scripture { verse_title: "${reference}"})`)
+  //     uuids.push(uuid)
+  //   })
+
+  //   const query = `${queries.join("\n")}\nreturn ${uuids.join(",")}`
+  //   localStorage.setItem("query", query)
+  // }, [normalizedReferences])
+
   useEffect(() => {
-    setMarkers(
-      tokenErrors.map((error) => ({
-        type: "text",
-        startCol: error.col,
-        endCol: error.col + error.length,
-        startRow: error.row,
-        endRow: error.row,
-        className: "reference_error",
-      }))
-    )
-  }, [tokenErrors])
+    const newMarkers: IMarker[] = []
+
+    // TODO: Maybe we can move to arrays for marginally better performance here?
+    for (const [, errors] of Object.entries(tokenErrors)) {
+      for (const error of errors) {
+        newMarkers.push({
+          type: "text",
+          startCol: error.col,
+          endCol: error.col + error.length,
+          startRow: error.row,
+          endRow: error.row,
+          className: "reference_error",
+        })
+      }
+    }
+
+    setMarkers(newMarkers)
+  }, [tokenErrors, actionInfo])
 
   return (
     <div className="flex flex-row h-full">

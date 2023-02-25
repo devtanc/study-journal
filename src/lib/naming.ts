@@ -1,3 +1,5 @@
+import uniq from "lodash.uniq"
+
 export const longBookNames = [
   "Genesis",
   "Exodus",
@@ -475,9 +477,9 @@ const matchDigitAndSpace = /\d /
 
 export const allNouns = [...characterNames, ...namesForChrist, ...nouns]
 export const allBookNames = [...longBookNames, ...shortBookNames]
-export const allBookNamesWithoutNumbers = [...longBookNames, ...shortBookNames].map((name) =>
-  name.replace(matchDigitAndSpace, "")
+export const allBookNamesWithoutNumbers: string[] = [...longBookNames, ...shortBookNames].map(
+  (name) => name.replace(matchDigitAndSpace, "")
 )
-export const longBookNamesWithoutNumbers = [
-  ...new Set(longBookNames.map((name) => name.replace(matchDigitAndSpace, ""))),
-]
+export const longBookNamesWithoutNumbers: string[] = uniq(
+  longBookNames.map((name) => name.replace(matchDigitAndSpace, ""))
+)
