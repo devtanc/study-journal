@@ -69,6 +69,10 @@ interface TokenErrorsByRow {
   [key: string]: TokenError[]
 }
 
+interface NormalizedReferences {
+  [key: string]: { [key: string]: number[] }
+}
+
 const bookNameMatch = `/^${allBookNames.join("|")}(?=\\. )/`
 const processTokens = (tokens: Token[]): Token[] =>
   tokens.map((token, index, tokens) => {
@@ -93,17 +97,18 @@ const processVerseString = (
   str: string,
   book: string,
   chapter: number
-): { verses: number[]; matches: Reference["matches"]; error: Reference["error"] } => {
+): { verses: number[]; matches: Reference["matches"]; error?: Reference["error"] } => {
   let inRange = false
   let matchStr: string | undefined | null = null
   let lastMatch: number | null = null
-  let error = ""
   const maxVerseCount = bookChapterVersesMap?.[book]?.[chapter]
 
   const result: Reference["verses"] = []
   const matches: Reference["matches"] = []
   if (!maxVerseCount) {
-    return { verses: result, matches, error: "Invalid book or chapter selection" }
+    return bookChapterVersesMap?.[book]
+      ? { verses: result, matches, error: "Invalid book name" }
+      : { verses: result, matches, error: "Invalid chapter specified" }
   }
 
   matchVerseGlobal.lastIndex = 0
@@ -139,7 +144,15 @@ const processVerseString = (
     }
   } while (matchStr)
 
-  return { verses: result, matches, error }
+  if (!result || result.length === 0) {
+    return {
+      verses: result,
+      matches,
+      error: "Invalid verse selection or verse selection out of range",
+    }
+  }
+
+  return { verses: result, matches }
 }
 
 const processReferenceString = (reference: string): Reference => {
@@ -171,7 +184,7 @@ export const Home = () => {
 
   const [scriptureTokenRows, setScriptureTokenRows] = useState<Token[][]>([])
   const [tokenErrors, setTokenErrors] = useState<TokenErrorsByRow>({})
-  const [normalizedReferences, setNormalizedReferences] = useState<string[]>([])
+  const [normalizedReferences, setNormalizedReferences] = useState<NormalizedReferences>({})
 
   const handleChange = useCallback(
     (text: string, actionInfo: ActionInfo) => {
@@ -237,7 +250,7 @@ export const Home = () => {
 
   useEffect(() => {
     const references: Reference[] = []
-    // let normalized: string[] = []
+    let normalized: NormalizedReferences = {}
     if (!actionInfo) return
 
     const endRow =
@@ -249,35 +262,40 @@ export const Home = () => {
       processedRowErrors[row] = []
       const tokens = scriptureTokenRows[row]
       let col = 0
+
       tokens.forEach((token) => {
-        if (token.type !== TokenNames.ScriptureReferenceWithbook) {
-          col += token.value.length
-          return
-        }
+        const currentCol = col
+        col += token.value.length
+        if (token.type !== TokenNames.ScriptureReferenceWithbook) return
         const { value, valueWithBook } = token
         const reference = processReferenceString(valueWithBook ?? value)
-
-        if (!bookChapterVersesMap[reference.book]?.[reference.chapter]) {
-          reference.error = "Invalid chapter or chapter out of range"
-        }
-        if (!reference.verses) {
-          reference.error = "Invalid verse selection or verse selection out of range"
-        }
 
         if (reference.error) {
           processedRowErrors[row].push({
             message: reference.error,
-            col,
+            col: currentCol,
             row,
             length: token.value.length,
           })
         } else {
           references.push(reference)
-        }
+          if (!reference.verses) return
+          if (!normalized[reference.book]) {
+            return (normalized[reference.book] = { [reference.chapter]: reference.verses ?? [] })
+          }
+          if (!normalized[reference.book][reference.chapter]) {
+            return (normalized[reference.book][reference.chapter] = reference.verses ?? [])
+          }
 
-        col += token.value.length
+          for (const verse of reference.verses) {
+            if (!normalized[reference.book][reference.chapter].includes(verse)) {
+              normalized[reference.book][reference.chapter].push(verse)
+            }
+          }
+        }
       })
     }
+    setNormalizedReferences(normalized)
     setTokenErrors((old) => ({ ...old, ...processedRowErrors }))
   }, [scriptureTokenRows, actionInfo])
 
@@ -285,18 +303,9 @@ export const Home = () => {
   //   console.log(currentlyHoveredToken)
   // }, [currentlyHoveredToken])
 
-  // useEffect(() => {
-  //   const queries: string[] = []
-  //   const uuids: string[] = []
-  //   normalizedReferences.forEach((reference) => {
-  //     const uuid = `v${v4().substring(0, 8)}`
-  //     queries.push(`MATCH (${uuid}:Scripture { verse_title: "${reference}"})`)
-  //     uuids.push(uuid)
-  //   })
-
-  //   const query = `${queries.join("\n")}\nreturn ${uuids.join(",")}`
-  //   localStorage.setItem("query", query)
-  // }, [normalizedReferences])
+  useEffect(() => {
+    console.log(normalizedReferences)
+  }, [normalizedReferences])
 
   useEffect(() => {
     const newMarkers: IMarker[] = []
