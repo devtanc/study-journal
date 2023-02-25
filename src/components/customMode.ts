@@ -15,7 +15,7 @@ export enum TokenNames {
   KeywordName = "keyword.name",
 }
 
-const noBookRegex = /\d{1,3}:\d{1,3}(-\d{1,3})?(, \d{1,3}(?:(?!:\d| ))(-\d{1,3})?)*(?:(?!\d))/
+const noBookRegex = /\d{1,3}:\d{1,3}(-\d{1,3})?(, ?\d{1,3}(?:(?!:\d| ))(-\d{1,3})?)*(?:(?!\d))/
 const noBookRegexString = noBookRegex.toString().slice(1, -1)
 export class StudyJournalHighlightRules extends ace.require("ace/mode/text_highlight_rules")
   .TextHighlightRules {
