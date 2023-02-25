@@ -304,6 +304,8 @@ export const Home = () => {
   // }, [currentlyHoveredToken])
 
   useEffect(() => {
+    // This set of verses willl change every time, but I think that's okay
+    // because we'll fetch that data and put in in local storage and pull whenever we need it
     console.log(normalizedReferences)
   }, [normalizedReferences])
 
