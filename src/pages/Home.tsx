@@ -302,6 +302,8 @@ export const Home = () => {
     const newMarkers: IMarker[] = []
 
     // TODO: Maybe we can move to arrays for marginally better performance here?
+    // Also, removing lines from the document will not remove props from this object
+    // But with an array, we could cut it to the length of session.getLines()
     for (const [, errors] of Object.entries(tokenErrors)) {
       for (const error of errors) {
         newMarkers.push({
