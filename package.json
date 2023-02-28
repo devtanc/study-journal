@@ -1,5 +1,5 @@
 {
   "scripts": {
-    "start": "DOPPLER_TOKEN='$(doppler configs tokens create dev --plain --max-age 1m)' docker-compose up -d"
+    "start": "DOPPLER_TOKEN=\"$(doppler configs tokens create dev --plain --max-age 1m)\" docker-compose up -d"
   }
 }

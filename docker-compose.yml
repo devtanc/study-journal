@@ -1,15 +1,15 @@
 ### https://neo4j.com/docs/operations-manual/current/docker/configuration/
 services:
-  server:
-    container_name: node_backend
-    build: .
-    ports:
-      - 3001:8080
-    environment:
-      - DOPPLER_TOKEN
-      - PORT=8080
-    depends_on:
-      - neo4j
+  # server:
+  #   container_name: node_backend
+  #   build: .
+  #   ports:
+  #     - 3001:8080
+  #   environment:
+  #     - DOPPLER_TOKEN
+  #     - PORT=8080
+  #   depends_on:
+  #     - neo4j
   neo4j:
     image: neo4j
     restart: unless-stopped

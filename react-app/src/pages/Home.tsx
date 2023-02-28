@@ -307,6 +307,16 @@ export const Home = () => {
     // This set of verses willl change every time, but I think that's okay
     // because we'll fetch that data and put in in local storage and pull whenever we need it
     console.log(normalizedReferences)
+    const query: { books: string[]; references: string[] } = { books: [], references: [] }
+    for (let [book, chapters] of Object.entries(normalizedReferences)) {
+      query.books.push(book)
+      for (let [chapter, verses] of Object.entries(chapters)) {
+        for (let verse of verses) {
+          query.references.push(`${book} ${chapter}:${verse}`)
+        }
+      }
+    }
+    console.log(query)
   }, [normalizedReferences])
 
   useEffect(() => {
