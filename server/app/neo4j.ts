@@ -23,21 +23,30 @@ export const ScriptureQuery = (titles: string[], references: string[]): Neo4JQue
   },
 })
 
-export const runQuery = async (data: Neo4JQuery) => {
+interface ScriptureResult {
+  reference: string
+  text: string
+}
+
+export type ScriptureQueryResultArray = [ScriptureResult]
+
+export const runQuery = async <T>(data: Neo4JQuery): Promise<T> => {
   const session = driver.session()
   let response: any = null
   try {
     await session.executeWrite(async (tx) => {
       const result = await tx.run(data.query, data.params)
 
-      response = result.records.reduce((acc: { [key: string]: string }, record) => {
-        acc[record.get("reference")] = record.get("text")
-        return acc
-      }, {})
+      response = result.records.map((record) =>
+        record.keys.reduce((acc: any, key) => {
+          acc[key] = record.get(key)
+          return acc
+        }, {})
+      )
     })
   } finally {
     await session.close()
   }
 
-  return response
+  return response as T
 }
