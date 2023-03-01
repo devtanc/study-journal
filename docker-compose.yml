@@ -36,3 +36,14 @@ services:
       ###  Configure timeouts
       - NEO4J_db_transaction_timeout=180s
       - NEO4J_db_lock_acquisition_timeout=240s
+  redis:
+    image: docker.io/bitnami/redis:7.0
+    container_name: redis
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - '6379:6379'
+    volumes:
+      - $HOME/Docker/volumes/redis:/bitnami/redis/data
