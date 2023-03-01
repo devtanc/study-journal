@@ -22,7 +22,9 @@ app.post("/scriptures", async (req, res) => {
   }
 
   try {
-    const results = await runQuery<ScriptureQueryResultArray>(ScriptureQuery(titles, references))
+    const results = await runQuery<ScriptureQueryResultArray>(
+      new ScriptureQuery(titles, references)
+    )
 
     res.json(
       results.reduce((acc: any, result) => {
