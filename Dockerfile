@@ -9,5 +9,5 @@ RUN apt-get update && apt-get install -y apt-transport-https ca-certificates cur
     echo "deb https://packages.doppler.com/public/cli/deb/debian any-version main" | tee /etc/apt/sources.list.d/doppler-cli.list && \
     apt-get update && \
     apt-get -y install doppler
-CMD ["doppler", "run", "--", "yarn", "start"]~
+CMD ["doppler", "run", "--", "yarn", "start-container"]~
 EXPOSE 8080

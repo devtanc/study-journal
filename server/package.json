@@ -7,7 +7,8 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "start": "yarn build && yarn start-server",
+    "start": "doppler run -- yarn start-server",
+    "start-container": "yarn build && yarn start-server",
     "start-server": "yarn nodemon index.ts",
     "build": "tsc"
   },
