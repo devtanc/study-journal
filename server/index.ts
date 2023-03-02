@@ -13,16 +13,13 @@ app.get("/", (req, res) => {
 
 app.post("/scriptures", async (req, res) => {
   const body = req.body
-  const { titles, references } = body ?? {}
-  if (
-    !(Array.isArray(titles) && Array.isArray(references)) ||
-    !(titles.length || references.length)
-  ) {
+  const { references } = body ?? {}
+  if (!Array.isArray(references) || !references.length) {
     return res.sendStatus(400)
   }
 
   try {
-    const results = await new ScriptureQuery(titles, references).run()
+    const results = await new ScriptureQuery(references).run()
 
     res.json(
       results.reduce((acc: any, result) => {
