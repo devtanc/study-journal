@@ -1,0 +1,1 @@
+export { ScriptureQuery } from "./ScriptureQuery"

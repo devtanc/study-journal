@@ -1,6 +1,6 @@
 import express from "express"
 import bodyParser from "body-parser"
-import { runQuery, ScriptureQuery, ScriptureQueryResultArray } from "./app/neo4j"
+import { ScriptureQuery } from "./app/lib/neo4j/queries"
 
 const app = express()
 app.use(bodyParser.json())
@@ -22,9 +22,7 @@ app.post("/scriptures", async (req, res) => {
   }
 
   try {
-    const results = await runQuery<ScriptureQueryResultArray>(
-      new ScriptureQuery(titles, references)
-    )
+    const results = await new ScriptureQuery(titles, references).run()
 
     res.json(
       results.reduce((acc: any, result) => {
