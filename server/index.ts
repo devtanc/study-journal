@@ -19,7 +19,7 @@ app.post("/scriptures", async (req, res) => {
   }
 
   try {
-    const results = await new ScriptureQuery(references).run()
+    const results = await new ScriptureQuery(references as string[]).run()
 
     res.json(
       results.reduce((acc: any, result) => {

@@ -4,13 +4,13 @@ const uri = process.env.NEO4J_URI ?? ""
 const username = process.env.NEO4J_USERNAME ?? ""
 const password = process.env.NEO4J_PASSWORD ?? ""
 
-export const driver = neo4j.driver(uri, neo4j.auth.basic(username, password))
-
-export interface Neo4JQuery {
+interface Neo4JQuery {
   query: string
   params: { [key: string]: any }
   returnFields: string[] | undefined
 }
+
+const driver = neo4j.driver(uri, neo4j.auth.basic(username, password))
 
 export const runQuery = async <T>(query: Neo4JQuery): Promise<T> => {
   const session = driver.session()

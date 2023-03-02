@@ -1,27 +1,29 @@
-import { Neo4JQuery, runQuery } from "../driver"
+import { runQuery } from "../driver"
 import uniq from "lodash.uniq"
-
-type ScriptureQueryReturnFields = ("reference" | "text")[]
+import { Query, ReturnFields } from "./Query"
 
 interface ScriptureResult {
   reference: string
   text: string
 }
 
-export type ScriptureQueryResultArray = [ScriptureResult]
+type ScriptureQueryReturnFields = ("reference" | "text")[]
+type ScriptureQueryResultArray = [ScriptureResult]
+type ScriptureParams = { titles?: string[]; references: string[] }
 
 const matchBook = /([1-4] )?[\w& ]+(?= )/
 
-export class ScriptureQuery implements Neo4JQuery {
+export class ScriptureQuery extends Query<ScriptureQueryResultArray> {
   query = `
     MATCH (s:Scripture)-[:IN]->(b:Book)
     WHERE b.title IN $titles AND s.verse_title IN $references
     RETURN s.verse_title AS reference, s.scripture_text AS text
   `
-  params: { titles?: string[]; references: string[] }
+  params: ScriptureParams
   returnFields: ScriptureQueryReturnFields | undefined
 
   constructor(references: string[], returnFields?: ScriptureQueryReturnFields) {
+    super()
     this.returnFields = returnFields
     this.params = {
       references,
@@ -38,13 +40,7 @@ export class ScriptureQuery implements Neo4JQuery {
     this.params.titles = titles
   }
 
-  run(returnFields?: ScriptureQueryReturnFields): Promise<ScriptureQueryResultArray> {
-    this.preRun()
-
-    return runQuery<ScriptureQueryResultArray>({
-      params: this.params,
-      query: this.query,
-      returnFields: returnFields ?? this.returnFields,
-    })
+  postRun<ScriptureQueryResultArray>(result: ScriptureQueryResultArray): ScriptureQueryResultArray {
+    return result
   }
 }
